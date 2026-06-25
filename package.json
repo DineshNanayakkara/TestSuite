@@ -1,0 +1,30 @@
+{
+  "name": "d365-playwright-test-suite",
+  "version": "0.1.0",
+  "description": "Generic, metadata-driven UI test suite for Dynamics 365 (Dataverse model-driven apps) using Playwright",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "discover": "tsx src/cli/discover.ts",
+    "test": "playwright test",
+    "test:full": "npm run discover && playwright test",
+    "test:forms": "playwright test tests/forms.spec.ts",
+    "test:unit": "playwright test tests/formxml.unit.spec.ts",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report artifacts/html-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1",
+    "@types/node": "26.0.1",
+    "tsx": "^4.20.6",
+    "typescript": "6.0.3"
+  },
+  "dependencies": {
+    "dotenv": "17.4.2",
+    "fast-xml-parser": "5.9.3"
+  }
+}
