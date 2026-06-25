@@ -10,6 +10,9 @@ blob-report/
 .auth/
 storageState.json
 
+# Generated demo video (regenerate with `npm run demo`)
+demo/output/
+
 # OS / editor
 .DS_Store
 *.log

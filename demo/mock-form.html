@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>New Account — DEMO</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Segoe UI", system-ui, sans-serif; color: #201f1e; background: #faf9f8; }
+    .watermark {
+      background: repeating-linear-gradient(45deg, #fff4ce, #fff4ce 20px, #ffeeb0 20px, #ffeeb0 40px);
+      color: #6b5800; font-size: 12px; font-weight: 600; text-align: center;
+      padding: 4px; letter-spacing: .3px; border-bottom: 1px solid #e1c97a;
+    }
+    .commandbar {
+      display: flex; align-items: center; gap: 14px;
+      background: #0b6a6a; color: #fff; padding: 8px 16px;
+    }
+    .commandbar .title { font-size: 18px; font-weight: 600; }
+    .commandbar .spacer { flex: 1; }
+    .commandbar button {
+      background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.35);
+      padding: 6px 14px; border-radius: 3px; font-size: 13px; cursor: pointer;
+    }
+    [role="tablist"] { display: flex; gap: 4px; background: #fff; border-bottom: 1px solid #edebe9; padding: 0 16px; }
+    [role="tab"] {
+      background: none; border: none; padding: 12px 16px; font-size: 14px; cursor: pointer;
+      border-bottom: 3px solid transparent; color: #323130;
+    }
+    [role="tab"][aria-selected="true"] { border-bottom-color: #0b6a6a; font-weight: 600; color: #0b6a6a; }
+    [data-id="errorNotifications"] {
+      margin: 12px 16px; padding: 10px 14px; background: #fde7e9; border: 1px solid #d13438;
+      color: #a4262c; border-radius: 3px; font-size: 13px;
+    }
+    .hidden { display: none !important; }
+    .formbody { padding: 16px 16px 28px; max-width: 760px; }
+    .section-title { font-size: 13px; font-weight: 600; color: #605e5c; margin: 14px 0 8px; text-transform: uppercase; letter-spacing: .4px; }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 13px; color: #323130; margin-bottom: 4px; }
+    .field .req { color: #a4262c; font-weight: 700; }
+    .field input {
+      width: 100%; padding: 8px 10px; font-size: 14px; border: 1px solid #605e5c;
+      border-radius: 2px; background: #fff;
+    }
+    .field input:focus { outline: 2px solid #0b6a6a; border-color: #0b6a6a; }
+    .pane.hidden { display: none; }
+    .caption {
+      position: fixed; left: 0; right: 0; bottom: 0; background: #201f1e; color: #fff;
+      font-size: 15px; padding: 14px 18px; min-height: 22px; letter-spacing: .2px;
+      border-top: 3px solid #0b6a6a;
+    }
+    .caption b { color: #4fd1c5; }
+  </style>
+</head>
+<body>
+  <div class="watermark">DEMO — mock model-driven form for illustration · NOT a live Dynamics 365 system</div>
+
+  <div class="commandbar">
+    <span class="title">New Account</span>
+    <div class="spacer"></div>
+    <button data-id="save">&#128190; Save</button>
+    <button>Save &amp; Close</button>
+  </div>
+
+  <div role="tablist">
+    <button role="tab" aria-selected="true" data-tab="general">General</button>
+    <button role="tab" aria-selected="false" data-tab="details">Details</button>
+  </div>
+
+  <div data-id="errorNotifications" class="hidden"></div>
+
+  <div class="formbody">
+    <div class="pane" data-pane="general">
+      <div class="section-title">Account Information</div>
+
+      <div class="field" data-id="account.name.fieldControl-text-box-text">
+        <label>Account Name <span class="req">*</span></label>
+        <input aria-required="true" aria-label="Account Name. Required" data-label="Account Name" />
+      </div>
+
+      <div class="field" data-id="account.accountnumber.fieldControl-text-box-text">
+        <label>Account Number</label>
+        <input aria-label="Account Number" data-label="Account Number" />
+      </div>
+
+      <div class="field" data-id="account.telephone1.fieldControl-text-box-text">
+        <label>Main Phone</label>
+        <input aria-label="Main Phone" data-label="Main Phone" />
+      </div>
+    </div>
+
+    <div class="pane hidden" data-pane="details">
+      <div class="section-title">Additional Details</div>
+      <div class="field" data-id="account.websiteurl.fieldControl-text-box-text">
+        <label>Website</label>
+        <input aria-label="Website" data-label="Website" />
+      </div>
+      <div class="field" data-id="account.revenue.fieldControl-text-box-text">
+        <label>Annual Revenue</label>
+        <input aria-label="Annual Revenue" data-label="Annual Revenue" />
+      </div>
+    </div>
+  </div>
+
+  <div class="caption" id="caption">&nbsp;</div>
+
+  <script>
+    // Tab switching (mirrors UCI role=tab behavior).
+    document.querySelectorAll('[role="tab"]').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('[role="tab"]').forEach((t) => t.setAttribute('aria-selected', 'false'));
+        tab.setAttribute('aria-selected', 'true');
+        const name = tab.getAttribute('data-tab');
+        document.querySelectorAll('.pane').forEach((p) => {
+          p.classList.toggle('hidden', p.getAttribute('data-pane') !== name);
+        });
+      });
+    });
+
+    // Save: blocks when a required field is empty, otherwise "saves" (adds ?id= to URL).
+    function attemptSave() {
+      const required = [...document.querySelectorAll('[aria-required="true"]')];
+      const empty = required.filter((i) => !i.value.trim());
+      const err = document.querySelector('[data-id="errorNotifications"]');
+      if (empty.length > 0) {
+        err.classList.remove('hidden');
+        err.textContent =
+          'You must provide a value for: ' + empty.map((i) => i.getAttribute('data-label')).join(', ');
+        return;
+      }
+      err.classList.add('hidden');
+      const id = '3b1f8e2a-7c44-4e1b-9a2d-6f5c0b9a1d23';
+      history.pushState({}, '', location.pathname + '?id=' + id);
+      document.querySelector('.commandbar .title').textContent = 'Contoso Ltd — Saved';
+    }
+    document.querySelector('[data-id="save"]').addEventListener('click', attemptSave);
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        attemptSave();
+      }
+    });
+  </script>
+</body>
+</html>
